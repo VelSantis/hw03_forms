@@ -4,7 +4,6 @@ from django.views.generic import CreateView
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 
-#from .forms import CreationForm
 
 from .forms import PostForm
 from .models import Post, Group
@@ -59,13 +58,13 @@ def post_detail(request, post_id):
     }
     return render(request, 'posts/post_detail.html', context)
 
+
 class PostCreate(CreateView):
     form_class = PostForm
     success_url = reverse_lazy('posts:index')
     template_name = 'posts/create_post.html'
 
 @login_required
-
 def post_create(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
