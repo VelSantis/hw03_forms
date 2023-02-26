@@ -1,16 +1,17 @@
+from django.views.generic import CreateView
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import CreateView
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
+
 from .forms import PostForm
 from .models import Post, Group, User
 
 
 def index(request):
     post_list = Post.objects.all().order_by('-pub_date')
-    paginator = Paginator(post_list, 10) 
+    paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
@@ -74,23 +75,28 @@ def post_create(request):
             post.author = request.user
             post.save()
             return redirect('posts:profile', request.user)
-        return render(request, 'posts/create_post.html', {'form': form, "is_edit": False})
+        return render(request, 'posts/create_post.html',
+                      {'form': form, "is_edit": False})
     else:
         form = PostForm()
-    return render(request, 'posts/create_post.html', {'form': form,"is_edit": False})
+    return render(request, 'posts/create_post.html',
+                  {'form': form, "is_edit": False})
 
-    
+
 @login_required
 def post_edit(request, post_id):
     post = Post.objects.get(pk=post_id)
     if post.author.id != request.user.id:
-        return HttpResponseRedirect(reverse('posts:post_detail', args=(post_id,)))
+        return HttpResponseRedirect(reverse('posts:post_detail',
+                                            args=(post_id,)))
     if request.method == "GET":
         form = PostForm(instance=post)
-        return render(request, 'posts/create_post.html', {'form': form, 'is_edit': True })
+        return render(request, 'posts/create_post.html',
+                      {'form': form, 'is_edit': True })
     form = PostForm(request.POST)
     if not form.is_valid():
-        return render(request, 'posts/create_post.html', {'form': form, 'is_edit': True })
+        return render(request, 'posts/create_post.html',
+                      {'form': form, 'is_edit': True })
 
     post.text = form.cleaned_data['text']
     post.group = form.cleaned_data['group']
