@@ -15,14 +15,15 @@
             Дата публикации: {{ post.pub_date|date:"d E Y" }}
           </li>
         </ul>
-        <p>{{ post.text|linebreaksbr }}</p>
-        <a href="{% url 'posts:post_detail' post_id %}">подробная информация </a>
+        <p>{{ post.text|linebreaksbr }}</p> 
+ 
+        <a href="{% url 'posts:post_detail' post.id %}">подробная информация </a>
         {% if post.group %}
           <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы {{ post.group.title }} </a>
         {% endif %}
       </article>
       {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
-    {% include 'includes/paginator.html' %}
+    {% include 'posts/paginator.html' %}
   </div>
 {% endblock %}

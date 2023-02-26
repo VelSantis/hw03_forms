@@ -19,8 +19,12 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('posts.urls')),
-    path('auth/', include('users.urls')),
-    path('auth/', include('django.contrib.auth.urls')),
     path('about/', include('about.urls', namespace='about')),
+    # Django проверяет url-адреса сверху вниз,
+    # нам нужно, чтобы Django сначала проверял адреса в приложении users
+    path('auth/', include('users.urls')),
+    # Все адреса с префиксом auth/
+    # будут перенаправлены в модуль django.contrib.auth
+    path('auth/', include('django.contrib.auth.urls')),
+    path('', include('posts.urls')),
 ]
