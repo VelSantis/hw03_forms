@@ -92,11 +92,11 @@ def post_edit(request, post_id):
     if request.method == "GET":
         form = PostForm(instance=post)
         return render(request, 'posts/create_post.html',
-                      {'form': form, 'is_edit': True })
+                      {'form': form, 'is_edit': True})
     form = PostForm(request.POST)
     if not form.is_valid():
         return render(request, 'posts/create_post.html',
-                      {'form': form, 'is_edit': True })
+                      {'form': form, 'is_edit': True})
 
     post.text = form.cleaned_data['text']
     post.group = form.cleaned_data['group']

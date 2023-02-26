@@ -1,5 +1,5 @@
 from django import forms
-#from .validators import validate_not_empty
+
 from .models import Post
 
 
