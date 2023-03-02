@@ -1,19 +1,17 @@
 from django.views.generic import CreateView
-from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy, reverse
+from django.contrib.auth.decorators import login_required
 
 from .forms import PostForm
 from .models import Post, Group, User
+from .utils import get_page_obj
 
 
 def index(request):
     post_list = Post.objects.all().order_by('-pub_date')
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = get_page_obj(request, post_list)
     context = {
         'page_obj': page_obj,
     }
@@ -22,10 +20,8 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    post_list = group.posts.all().order_by('-pub_date')
-    paginator = Paginator(post_list, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    post_list = group.posts.all()
+    page_obj = get_page_obj(request, post_list)
     context = {
         'group': group,
         'page_obj': page_obj,
@@ -34,14 +30,10 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    posts = Post.objects.filter(author__username=username).order_by("pub_date")
-    post_count = Post.objects.filter(author__username=username).count()
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    posts = Post.objects.filter(author__username=username)
+    #post_count = Post.objects.filter(author__username=username).count()
+    page_obj = get_page_obj(request, posts)
     context = {
-        'posts': posts,
-        'post_count': post_count,
         'page_obj': page_obj,
         'author': User.objects.get(username=username)
     }

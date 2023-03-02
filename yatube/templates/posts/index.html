@@ -1,26 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %} Последнии обновления на сатйе {% endblock %}
-{% block header %} Последние обновления на сайте {% endblock %}
 
 {% block content %}
-
   {% for post in page_obj %}
-    <article>
-      <ul>
-        <li>
-          Автор: {{ post.author.get_full_name }}
-        </li>
-        <li>
-          Дата публикации: {{ post.pub_date|date:"d E Y" }}
-        </li>
-      </ul>
-      <p>{{ post.text|linebreaksbr }}</p>
-      {% if post.group %}   
-        <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы {{ post.group.title }}</a>
-      {% endif %}
-    </article>  
+  {% include 'includes/post_card.html' %} 
     {% if not forloop.last %}<hr>{% endif %}
   {% endfor %}
-  {% include 'posts/paginator.html' %}
+  {% include 'includes/paginator.html' %}
 {% endblock %}
