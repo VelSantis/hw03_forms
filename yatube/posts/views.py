@@ -8,7 +8,7 @@ from .utils import get_page_obj
 
 
 def index(request):
-    post_list = Post.objects.all().order_by('-pub_date')
+    post_list = Post.objects.all()
     page_obj = get_page_obj(request, post_list)
     context = {
         'page_obj': page_obj,
@@ -51,7 +51,7 @@ def post_create(request):
     form = PostForm(request.POST or None)
     if not form.is_valid():
         return render(request, 'posts/create_post.html',
-                      {'form': form, "is_edit": False})
+                      {'form': form})
     post = Post()
     post.text = form.cleaned_data['text']
     post.group = form.cleaned_data['group']
@@ -62,7 +62,7 @@ def post_create(request):
 
 @login_required
 def post_edit(request, post_id):
-    post = Post.objects.get(pk=post_id)
+    post = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return redirect(reverse('posts:post_detail',
                                 args=(post_id,)))
