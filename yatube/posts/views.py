@@ -1,7 +1,5 @@
-from django.views.generic import CreateView
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 from .forms import PostForm
@@ -30,68 +28,47 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    posts = Post.objects.filter(author__username=username)
-    #post_count = Post.objects.filter(author__username=username).count()
+    author = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(author=author)
     page_obj = get_page_obj(request, posts)
     context = {
         'page_obj': page_obj,
-        'author': User.objects.get(username=username)
+        'author': author
     }
     return render(request, 'posts/profile.html', context)
 
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    post_count = Post.objects.filter(author=post.author).count()
     context = {
         'post': post,
-        'post_count': post_count
     }
     return render(request, 'posts/post_detail.html', context)
 
 
-class PostCreate(CreateView):
-    form_class = PostForm
-    success_url = reverse_lazy('posts:index')
-    template_name = 'posts/create_post.html'
-
-
 @login_required
 def post_create(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = Post()
-            post.text = form.cleaned_data['text']
-            post.group = form.cleaned_data['group']
-            post.author = request.user
-            post.save()
-            return redirect('posts:profile', request.user)
+    form = PostForm(request.POST or None)
+    if not form.is_valid():
         return render(request, 'posts/create_post.html',
-                      {'form': form, "is_edit": False})
-    else:
-        form = PostForm()
-    return render(request, 'posts/create_post.html',
-                  {'form': form, "is_edit": False})
+                      {'form': form, "is_edit": False}) 
+    post = Post()
+    post.text = form.cleaned_data['text']
+    post.group = form.cleaned_data['group']
+    post.author = request.user
+    post.save()
+    return redirect('posts:profile', request.user)
 
 
 @login_required
 def post_edit(request, post_id):
     post = Post.objects.get(pk=post_id)
-    if post.author.id != request.user.id:
-        return HttpResponseRedirect(reverse('posts:post_detail',
-                                            args=(post_id,)))
-    if request.method == "GET":
-        form = PostForm(instance=post)
-        return render(request, 'posts/create_post.html',
-                      {'form': form, 'is_edit': True})
-    form = PostForm(request.POST)
+    if post.author != request.user:
+        return redirect(reverse('posts:post_detail',
+                                args=(post_id,)))
+    form = PostForm(request.POST or None, instance=post)
     if not form.is_valid():
         return render(request, 'posts/create_post.html',
-                      {'form': form, 'is_edit': True})
-
-    post.text = form.cleaned_data['text']
-    post.group = form.cleaned_data['group']
-    post.author = request.user
-    post.save()
+                      {'form': form, "is_edit": True}) 
+    form.save()
     return redirect('posts:post_detail', post.id)

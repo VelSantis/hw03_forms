@@ -24,7 +24,7 @@
           Всего постов автора:  <span >{{ post.author.posts.count }}</span>
         </li>
         <li class="list-group-item">
-          <a href="{% url 'posts:profile' post.author.id %}">
+          <a href="{% url 'posts:profile' post.author.username %}">
             все посты пользователя
           </a>
         </li>
