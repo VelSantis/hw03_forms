@@ -2,7 +2,6 @@ from django.core.paginator import Paginator
 from django.conf import settings
 
 
-
 def get_page_obj(request, objects):
     paginator = Paginator(objects, settings.PAGE_SIZE)
     page_number = request.GET.get('page')

@@ -51,7 +51,7 @@ def post_create(request):
     form = PostForm(request.POST or None)
     if not form.is_valid():
         return render(request, 'posts/create_post.html',
-                      {'form': form, "is_edit": False}) 
+                      {'form': form, "is_edit": False})
     post = Post()
     post.text = form.cleaned_data['text']
     post.group = form.cleaned_data['group']
@@ -69,6 +69,6 @@ def post_edit(request, post_id):
     form = PostForm(request.POST or None, instance=post)
     if not form.is_valid():
         return render(request, 'posts/create_post.html',
-                      {'form': form, "is_edit": True}) 
+                      {'form': form, "is_edit": True})
     form.save()
     return redirect('posts:post_detail', post.id)
